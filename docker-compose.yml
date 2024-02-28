@@ -1,0 +1,32 @@
+version: '3.0'
+services:
+  bot-db:
+    image: postgres:alpine
+    container_name: notification-system-bot-db
+    ports:
+      - '5432:5432'
+    environment:
+      - 'POSTGRES_USER=postgres'
+      - 'POSTGRES_DB=notification_service'
+      - 'POSTGRES_PASSWORD=password'
+    volumes:
+      - pg_bot:/var/lib/postgresql/data
+
+  bot-api:
+    build: .
+    container_name: notification-system-auth-api
+    command: java -jar app.jar
+    restart: unless-stopped
+    ports:
+      - '8080:8080'
+    environment:
+      - 'PG_DB_URL=jdbc:postgresql://bot-db:5432/notification_service'
+      - 'PG_DB_USERNAME=postgres'
+      - 'PG_DB_PASSWORD=password'
+      - 'BOT_TOKEN=6641248686:AAF9Rf7REkP1Jd9px1AiNUpuNJN176GUWfY'
+      - 'BOT_NAME=noisynotice_bot'
+    depends_on:
+      - bot-db
+
+volumes:
+  pg_bot:
